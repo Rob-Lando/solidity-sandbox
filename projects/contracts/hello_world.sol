@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.0;
 
-contract ay_yo_whudup {
+contract message_logger {
     
     struct message_details {
         uint num;
@@ -12,44 +12,36 @@ contract ay_yo_whudup {
     }
 
     // define state variables
-    uint num_greets;
-    string greeting;
-    //mapping(uint => message_details) public greetings;
-    message_details[] greetings;
+    uint num_messages;
+    string latest_message;
+    message_details[] message_log;
 
-    function set_greeting(string memory _dude) public {
+    function set_latest_message(string memory _message, string memory _to) public {
 
-            greeting = string.concat("Ay yo whudup, ",_dude,"!!!");
+            latest_message = _message;
             
-            greetings.push(
+            message_log.push(
                             message_details(
                                         {
-                                            num: num_greets,
+                                            num: num_messages,
                                             sender:     msg.sender,
-                                            to:         _dude,
-                                            message:    greeting
+                                            to:         _to,
+                                            message:    latest_message
                                         }
                                     )
             );
 
-            /*
-            greetings[num_greets] = message_details({
-                                        sender:     msg.sender,
-                                        to:         _dude,
-                                        message:    greeting
-                                        });
-            */
-            num_greets++;
+            num_messages++;
 
     }
 
-    function last_greet() public view returns (string memory) {
-        return greeting;
+    function get_latest_message() public view returns (string memory) {
+        return latest_message;
     }
 
-    function all_greetings() public view returns (message_details[] memory) {
+    function get_all_messages() public view returns (message_details[] memory) {
         
-        return greetings;
+        return message_log;
     
     }
 
