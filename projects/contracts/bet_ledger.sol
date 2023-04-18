@@ -20,30 +20,29 @@ contract price_prediction_market {
     //set state variables
     mapping(address => prediction_details[]) history;
 
-    function set_prediction_details(string _symbol, uint _direction, uint _wager) public returns (prediction_details memory) {
+    function set_prediction_details(string memory _symbol, uint _direction, uint _wager) public returns (prediction_details memory) {
 
-        require(wager < address(this).balance/1000);
+        require(_wager < address(this).balance/1000, "Wager is too high!!!");
 
-        _status internal memory;
-        _status = open;
-
-        history[msg.sender] = history[msg.sender].push(
-                                                prediction_details(
+        prediction_details memory new_prediction =   prediction_details(
                                                         {
                                                             // unix_timestamp:_unix_timestamp,
                                                             // eventually this will be parst of the structm need to make an api call to get a reliable stamp
                                                             symbol:_symbol,
                                                             direction:_direction,
-                                                            wager:_wager
-                                                            Status: _status
+                                                            wager:_wager,
+                                                            status: Status.open
                                                         }
-                                                    )
-                                                )
+                                                    );
+
+        history[msg.sender].push(new_prediction);
+
+        return new_prediction;
     }
 
-    function get_address_wager_history(address _address) public view {
+    function get_address_wager_history() public view returns (prediction_details[] memory) {
 
-        return history[msg.sender]
+        return history[msg.sender];
 
     }
 
