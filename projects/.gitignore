@@ -5,3 +5,5 @@ __pycache__
 build/
 reports/
 node_modules/
+contracts/package.json
+contracts/package-lock.json
