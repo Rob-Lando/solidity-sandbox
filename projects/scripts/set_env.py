@@ -1,4 +1,4 @@
-from modules.env_helper.env_encryptor import setup_env
+from modules.env_encryptor import setup_env
 
 def main():
     
