@@ -51,8 +51,10 @@ contract price_prediction_market {
 
         prediction_details memory new_prediction =   prediction_details(
                                                         {
-                                                            // unix_timestamp:_unix_timestamp,
-                                                            // eventually this will be part of the struct, need to make an api call to get a reliable stamp
+                                                            /* unix_timestamp:_unix_timestamp,
+                                                            eventually this will be part of the struct, 
+                                                            need to make an api call to get a reliable stamp
+                                                            */
                                                             symbol: _symbol,
                                                             reference_price: eth_usd,
                                                             direction: _direction,
