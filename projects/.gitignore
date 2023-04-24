@@ -7,3 +7,4 @@ reports/
 node_modules/
 contracts/package.json
 contracts/package-lock.json
+scripts/compare_hex.json
