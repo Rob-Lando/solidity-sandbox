@@ -66,6 +66,9 @@ def encrypt_secret(key: bytes, secret_to_encrypt: str) -> bytes:
 
 def decrypt_env_secret(secret_name: str):
 
+    print(f"<{os.environ.get(secret_name)}>")
+
+    """
     encrypted_secret = bytes.fromhex(os.environ.get(secret_name))
 
     nonce = encrypted_secret[:8]
@@ -78,6 +81,7 @@ def decrypt_env_secret(secret_name: str):
     decrypted_secret = str(cipher.decrypt(ciphertext))
 
     return decrypted_secret
+    """
 
 def write_encrypted_secret_to_env(encrypted_secrets: dict, path_to_env_file: str):
 
