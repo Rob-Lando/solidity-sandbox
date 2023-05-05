@@ -57,8 +57,6 @@ def salt_gen(verify_json):
 
     salt = get_random_bytes(16)
     
-    _key = scrypt(password = _pwd, salt = salt, key_len = 32, N=2**14, r=8, p=1)
-    
     # store salt in verify_json
     with open(verify_json, "r") as __file__:
 
@@ -70,7 +68,7 @@ def salt_gen(verify_json):
 
         json.dump(verify,__file__)
 
-    return _key
+    return None
 
 def key_gen(verify_json):
 
