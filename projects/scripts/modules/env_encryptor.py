@@ -1,5 +1,8 @@
 from Crypto.Hash import keccak
 from Crypto.Cipher import Salsa20
+from Crypto.Protocol.KDF import scrypt
+from Crypto.Random import get_random_bytes
+import argon2
 import pwinput
 import json
 import os
@@ -19,6 +22,42 @@ def hash_value(val: str):
     del val
 
     return keccak256.digest(),keccak256.hexdigest()
+
+def verify_password(verify_json):
+
+    ph = argon2.PasswordHasher()
+    
+    with open(verify_json,"w") as verify:
+
+        stored_hash = json.load(verify) 
+
+        _pwd = pwinput.pwinput(mask = "$")
+
+        ph.verify(stored_hash['hash'],_pwd)
+
+        if ph.check_needs_rehash(stored_hash):
+
+            new_hash = {"hash":ph.hash(_pwd)}
+
+            json.dump(new_hash, verify)
+    
+    return _pwd
+
+def key_gen(verify_json):
+
+    _pwd = verify_password(verify_json = verify_json)
+
+    salt = get_random_bytes(16)
+    
+    _key = scrypt(password = _pwd, salt = salt, key_len = 32, N=2**14, r=8, p=1)
+
+    return _key
+
+
+
+
+
+    
 
 def set_and_verify_key():
 
