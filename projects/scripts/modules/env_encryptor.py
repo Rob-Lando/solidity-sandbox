@@ -31,7 +31,7 @@ def verify_password(verify_json):
 
     ph = argon2.PasswordHasher()
     
-    with open(verify_json,"w") as verify:
+    with open(verify_json,"r") as verify:
 
         stored_hash = json.load(verify) 
 
@@ -39,11 +39,13 @@ def verify_password(verify_json):
 
         ph.verify(stored_hash['hash'],_pwd)
 
-        if ph.check_needs_rehash(stored_hash):
+        if ph.check_needs_rehash(stored_hash['hash']):
 
-            new_hash = {"hash":ph.hash(_pwd)}
-
-            json.dump(new_hash, verify)
+            with open(verify_json,"w") as verify:
+                
+                new_hash = {"hash":ph.hash(_pwd)}
+                
+                json.dump(new_hash, verify)
     
     return _pwd
 
@@ -62,7 +64,7 @@ def salt_gen(verify_json):
 
         verify = json.load(__file__)
 
-        verify["key_salt"] = salt
+        verify["key_salt"] = salt.hex()
 
     with open(verify_json, "w") as __file__:
 
@@ -80,7 +82,7 @@ def key_gen(verify_json):
 
         verify = json.load(__file__)
 
-        salt = verify["key_salt"]
+        salt = bytes.from_hex(verify["key_salt"])
     
     _key = scrypt(password = _pwd, salt = salt, key_len = 32, N=2**14, r=8, p=1)
 
