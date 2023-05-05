@@ -25,6 +25,10 @@ def hash_value(val: str):
 
 def verify_password(verify_json):
 
+    """
+    Verify password and rehash if needed.
+    """
+
     ph = argon2.PasswordHasher()
     
     with open(verify_json,"w") as verify:
@@ -43,49 +47,46 @@ def verify_password(verify_json):
     
     return _pwd
 
-def key_gen(verify_json):
+def salt_gen(verify_json):
+
+    """
+    Generate and store salt for key gen/verification.
+    """
 
     _pwd = verify_password(verify_json = verify_json)
 
     salt = get_random_bytes(16)
     
     _key = scrypt(password = _pwd, salt = salt, key_len = 32, N=2**14, r=8, p=1)
+    
+    # store salt in verify_json
+    with open(verify_json, "r") as __file__:
+
+        verify = json.load(__file__)
+
+        verify["key_salt"] = salt
+
+    with open(verify_json, "w") as __file__:
+
+        json.dump(verify,__file__)
 
     return _key
 
+def key_gen(verify_json):
 
+    """Generate encryption key using stored salt"""
 
+    _pwd = verify_password(verify_json = verify_json)
 
+    with open(verify_json, "r") as __file__:
 
+        verify = json.load(__file__)
+
+        salt = verify["key_salt"]
     
+    _key = scrypt(password = _pwd, salt = salt, key_len = 32, N=2**14, r=8, p=1)
 
-def set_and_verify_key():
-
-    _pwd = get_masked_user_input("Type encryption password") # user input password
-
-    _front = _pwd[:len(_pwd)//2]
-    _back = _pwd[len(_pwd)//2:]
-
-    mod_hex_key = hash_value(val = _back)[1] # hash back half of user input
-
-    del _back
-
-    with open("compare_hex.json") as f:
-        compare_hex = dict(json.loads(f.read()))
-        f.close()
-
-    if mod_hex_key == compare_hex['key']: # if mod_hex_key equals static value in json, then password was correct
-
-        _bin_key = hash_value(val = _front)[0] # hash front half of user input to reproduce encryption key
-        
-        del _front
-
-        return _bin_key
-    
-    else:
-
-        raise ValueError("Incorrect encryption password entered!")
-
+    return _key
 
 def encrypt_secret(key: bytes, secret_to_encrypt: str) -> bytes:
 
@@ -102,25 +103,6 @@ def encrypt_secret(key: bytes, secret_to_encrypt: str) -> bytes:
     print(f"\n\nencrypted_secret is:-> {msg} | {type(msg)}")
 
     return msg
-
-def decrypt_env_secret(secret_name: str):
-
-    print(f"<{os.environ.get(secret_name)}>")
-
-    
-    encrypted_secret = bytes.fromhex(os.environ.get(secret_name))
-
-    nonce = encrypted_secret[:8]
-    ciphertext = encrypted_secret[8:]
-
-    _bin_key = set_and_verify_key()
-
-    cipher = Salsa20.new(key = _bin_key, nonce = nonce)
-
-    decrypted_secret = str(cipher.decrypt(ciphertext))
-
-    return decrypted_secret
-    
 
 def write_encrypted_secret_to_env(encrypted_secrets: dict, path_to_env_file: str):
 
@@ -145,11 +127,13 @@ def load_env(path_to_env_file):
             key, value = line.strip().split('=')
             os.environ[key] = value
 
+    return None
 
 
-def setup_env(env_path):
+
+def setup_env(env_path, verify_json):
         
-    _bin_key = set_and_verify_key()
+    _bin_key = key_gen(verify_json = verify_json)
 
     secret_name = input("\nType the name of the secret you want to encrypt:")
 
@@ -163,15 +147,17 @@ def setup_env(env_path):
     
     del _bin_key
 
+    return None
 
-def decrypt_env_secret(secret_name: str):
+
+def decrypt_env_secret(secret_name: str, verify_json: str):
 
     encrypted_secret = bytes.fromhex(os.environ.get(secret_name))
 
     nonce = encrypted_secret[:8]
     ciphertext = encrypted_secret[8:]
 
-    _bin_key = set_and_verify_key()
+    _bin_key = key_gen(verify_json = verify_json)
 
     cipher = Salsa20.new(key = _bin_key, nonce = nonce)
 
