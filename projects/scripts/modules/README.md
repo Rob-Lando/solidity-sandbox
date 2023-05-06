@@ -2,9 +2,9 @@
 
 General Process:
 
-- Take masked user input password and generate hash/salt using Argon2id from (https://argon2-cffi.readthedocs.io/en/stable/index.html).   
-This hash and salt can be stored visibly in a file named 'verify.json' as initial setup.  
-#### Manually generating hash & salt  
+- Take masked user input password and generate hash string using Argon2id from (https://argon2-cffi.readthedocs.io/en/stable/index.html).   
+This string contains the password hash & salt and can be stored visibly in a file named 'verify.json' as initial setup.  
+#### Manually generating hash & salt as initial setup  
 
 ```python
     import pwinput
@@ -16,7 +16,7 @@ This hash and salt can be stored visibly in a file named 'verify.json' as initia
         json.dump({"hash":hash},__file__)
 ```  
 
-- The stored hash is used for password verification before generating a key for encryption/decryption with the password and stored salt.  
+- The stored string is used for password verification before generating a key for encryption/decryption with the verified password and the stored salt.  
 Encryption key is generated with using https://www.pycryptodome.org/src/protocol/kdf#Crypto.Protocol.KDF.scrypt
 
 - Use generated key as input to Salsa20 symmetric encryption algorithm for encrypting or decrypting env vars.  
