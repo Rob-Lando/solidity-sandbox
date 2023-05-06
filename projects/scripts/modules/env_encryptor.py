@@ -24,6 +24,18 @@ def hash_value(val: str):
 
     return keccak256.digest(),keccak256.hexdigest()
 
+def store_argon2_hash_as_json(destination_path):
+
+    with open(destination_path,"w") as __file__:
+
+        ph = argon2.PasswordHasher()
+
+        hash = ph.hash(pwinput.pwinput(mask = "$"))
+        
+        json.dump({"hash":hash},__file__)
+
+    return None
+
 
 def verify_password(verify_json):
 
