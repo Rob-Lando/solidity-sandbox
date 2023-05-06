@@ -2,10 +2,9 @@
 
 General Process:
 
-- Take masked user input password and hash using Argon2id from (https://argon2-cffi.readthedocs.io/en/stable/index.html).  
-Generate salt w/ https://pycryptodome.readthedocs.io/en/latest/src/random/random.html#Crypto.Random.get_random_bytes  
+- Take masked user input password and generate hash/salt using Argon2id from (https://argon2-cffi.readthedocs.io/en/stable/index.html).   
 This hash and salt can be stored visibly in a file named 'verify.json' as initial setup.  
-#### Manually generating hash  
+#### Manually generating hash & salt  
 
 ```python
     import pwinput
