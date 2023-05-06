@@ -2,6 +2,7 @@ from Crypto.Hash import keccak
 from Crypto.Cipher import Salsa20
 from Crypto.Protocol.KDF import scrypt
 from Crypto.Random import get_random_bytes
+import base64
 import argon2
 import pwinput
 import json
@@ -81,8 +82,10 @@ def key_gen(verify_json):
     with open(verify_json, "r") as __file__:
 
         verify = json.load(__file__)
+        stored_hash = verify['hash']
 
-        salt = bytes.fromhex(verify["key_salt"])
+        salt_base64 = stored_hash.split('$')[4]
+        salt = base64.b64decode(salt_base64)
     
     _key = scrypt(password = _pwd, salt = salt, key_len = 32, N=2**14, r=8, p=1)
 
