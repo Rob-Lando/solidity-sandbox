@@ -24,8 +24,7 @@ https://pycryptodome.readthedocs.io/en/latest/src/cipher/salsa20.html
   
   
 ## *Note:*  
-Currently, Nothing is stopping the verify.json file from being overwritten  
-with a new hash string generated from a different user input value  
+Currently, Nothing is stopping the verify.json file from being overwritten with a new hash string generated from a different user input value  
 from someone other than the one who created the last version of the verify.json file.  
 Consequently, encrypted env secrets can be overwritten at will.  
 However, previously encrypted secrets still will not be able to be decrypted without the previous password  
