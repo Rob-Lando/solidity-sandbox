@@ -9,3 +9,4 @@ contracts/package.json
 contracts/package-lock.json
 scripts/compare_hex.json
 scripts/verify.json
+scripts/test_decrypt.py
