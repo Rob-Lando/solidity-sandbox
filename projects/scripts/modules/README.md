@@ -14,8 +14,8 @@ This hash and salt can be stored visibly in a file named 'verify.json' as initia
     with open("verify.json","w") as __file__:
         ph = argon2.PasswordHasher()
         hash = ph.hash(pwinput.pwinput(mask = "$"))
-        json.dump({"hash":hash},__file__)
-    ```  
+        json.dump({"hash":hash},__file__)```
+      
     
 - The stored hash is used for password verification before generating a key for encryption/decryption with the password and stored salt.  
 Encryption key is generated with using https://www.pycryptodome.org/src/protocol/kdf#Crypto.Protocol.KDF.scrypt  
