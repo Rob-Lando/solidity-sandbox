@@ -1,4 +1,3 @@
-from Crypto.Hash import keccak
 from Crypto.Cipher import Salsa20
 from Crypto.Protocol.KDF import scrypt
 import base64
