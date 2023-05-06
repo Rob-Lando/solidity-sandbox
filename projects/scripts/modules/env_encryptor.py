@@ -14,16 +14,6 @@ def get_masked_user_input(prompt):
     return user_input
 
 
-def hash_value(val: str):
-
-    keccak256 = keccak.new(digest_bits = 256)
-
-    keccak256.update(bytes(val,'utf-8'))
-
-    del val
-
-    return keccak256.digest(),keccak256.hexdigest()
-
 def store_argon2_hash_as_json(destination_path):
 
     with open(destination_path,"w") as __file__:
@@ -31,7 +21,7 @@ def store_argon2_hash_as_json(destination_path):
         ph = argon2.PasswordHasher()
 
         hash = ph.hash(pwinput.pwinput(mask = "$"))
-        
+
         json.dump({"hash":hash},__file__)
 
     return None
