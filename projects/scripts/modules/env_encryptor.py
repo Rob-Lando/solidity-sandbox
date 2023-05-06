@@ -1,7 +1,6 @@
 from Crypto.Hash import keccak
 from Crypto.Cipher import Salsa20
 from Crypto.Protocol.KDF import scrypt
-from Crypto.Random import get_random_bytes
 import base64
 import argon2
 import pwinput
@@ -14,6 +13,7 @@ def get_masked_user_input(prompt):
 
     return user_input
 
+
 def hash_value(val: str):
 
     keccak256 = keccak.new(digest_bits = 256)
@@ -23,6 +23,7 @@ def hash_value(val: str):
     del val
 
     return keccak256.digest(),keccak256.hexdigest()
+
 
 def verify_password(verify_json):
 
@@ -50,28 +51,6 @@ def verify_password(verify_json):
     
     return _pwd
 
-def salt_gen(verify_json):
-
-    """
-    Generate and store salt for key gen/verification.
-    """
-
-    _pwd = verify_password(verify_json = verify_json)
-
-    salt = get_random_bytes(16)
-    
-    # store salt in verify_json
-    with open(verify_json, "r") as __file__:
-
-        verify = json.load(__file__)
-
-        verify["key_salt"] = salt.hex()
-
-    with open(verify_json, "w") as __file__:
-
-        json.dump(verify,__file__)
-
-    return None
 
 def key_gen(verify_json):
 
@@ -87,7 +66,7 @@ def key_gen(verify_json):
     salt_base64 = stored_hash.split('$')[4]
     missing_padding = 4 - len(salt_base64) % 4
     salt_base64_padded = salt_base64 + '=' * missing_padding
-    
+
     salt = base64.b64decode(salt_base64_padded)
     
     _key = scrypt(password = _pwd, salt = salt, key_len = 32, N=2**14, r=8, p=1)
@@ -95,6 +74,7 @@ def key_gen(verify_json):
     del _pwd
 
     return _key
+
 
 def encrypt_secret(key: bytes, secret_to_encrypt: str) -> bytes:
 
@@ -111,6 +91,7 @@ def encrypt_secret(key: bytes, secret_to_encrypt: str) -> bytes:
     print(f"\n\nencrypted_secret is:-> {msg} | {type(msg)}")
 
     return msg
+
 
 def write_encrypted_secrets_to_env(encrypted_secrets: dict, path_to_env_file: str):
 
@@ -136,7 +117,6 @@ def load_env(path_to_env_file):
             os.environ[key] = value
 
     return None
-
 
 
 def setup_env(env_path, verify_json):
@@ -188,3 +168,4 @@ def decrypt_env_secret(_bin_key: bytes, secret_name: str):
     decrypted_secret = str(cipher.decrypt(ciphertext))
 
     return decrypted_secret
+
