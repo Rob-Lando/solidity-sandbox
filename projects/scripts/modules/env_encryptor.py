@@ -84,10 +84,11 @@ def key_gen(verify_json):
         verify = json.load(__file__)
         stored_hash = verify['hash']
 
-        salt_base64 = stored_hash.split('$')[4]
-        missing_padding = 4 - len(salt_base64) % 4
-        salt_base64_padded = salt_base64 + '=' * missing_padding
-        salt = base64.b64decode(salt_base64_padded)
+    salt_base64 = stored_hash.split('$')[4]
+    missing_padding = 4 - len(salt_base64) % 4
+    salt_base64_padded = salt_base64 + '=' * missing_padding
+    
+    salt = base64.b64decode(salt_base64_padded)
     
     _key = scrypt(password = _pwd, salt = salt, key_len = 32, N=2**14, r=8, p=1)
 
