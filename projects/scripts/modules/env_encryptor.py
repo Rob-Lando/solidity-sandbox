@@ -6,12 +6,6 @@ import pwinput
 import json
 import os
 
-def get_masked_user_input(prompt):
-
-    user_input = pwinput.pwinput(f"\n\n{prompt}:", mask = "$")
-
-    return user_input
-
 
 def store_argon2_hash_as_json(destination_path):
 
@@ -128,10 +122,12 @@ def setup_env(env_path, verify_json):
     while True:
 
         add_another = None
-        secret_name = input("\nType the name of the secret you want to encrypt:")
+        secret_name = input("\n\nType the name of the secret you want to encrypt:")
         encrypted_secrets[secret_name] = encrypt_secret(key = _bin_key,
-                                                        secret_to_encrypt = get_masked_user_input(f"Now type its secret value\n{secret_name}")
+                                                        secret_to_encrypt = pwinput.pwinput(f"\n\nNow type its secret value {secret_name}",
+                                                                                            mask = "$")
                                                     )
+
         while True:
 
             try:
@@ -169,4 +165,3 @@ def decrypt_env_secret(_bin_key: bytes, secret_name: str):
     decrypted_secret = str(cipher.decrypt(ciphertext))
 
     return decrypted_secret
-
