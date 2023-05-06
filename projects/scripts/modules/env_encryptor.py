@@ -86,6 +86,8 @@ def key_gen(verify_json):
     
     _key = scrypt(password = _pwd, salt = salt, key_len = 32, N=2**14, r=8, p=1)
 
+    del _pwd
+
     return _key
 
 def encrypt_secret(key: bytes, secret_to_encrypt: str) -> bytes:
