@@ -82,7 +82,7 @@ def key_gen(verify_json):
 
         verify = json.load(__file__)
 
-        salt = bytes.from_hex(verify["key_salt"])
+        salt = bytes.fromhex(verify["key_salt"])
     
     _key = scrypt(password = _pwd, salt = salt, key_len = 32, N=2**14, r=8, p=1)
 
@@ -104,7 +104,7 @@ def encrypt_secret(key: bytes, secret_to_encrypt: str) -> bytes:
 
     return msg
 
-def write_encrypted_secret_to_env(encrypted_secrets: dict, path_to_env_file: str):
+def write_encrypted_secrets_to_env(encrypted_secrets: dict, path_to_env_file: str):
 
     with open(path_to_env_file, "w") as f:
 
@@ -134,30 +134,46 @@ def load_env(path_to_env_file):
 def setup_env(env_path, verify_json):
         
     _bin_key = key_gen(verify_json = verify_json)
+    encrypted_secrets = {}
 
-    secret_name = input("\nType the name of the secret you want to encrypt:")
+    while True:
 
-    msg = encrypt_secret(key = _bin_key,
-                            secret_to_encrypt = get_masked_user_input(f"Now type its secret value\n{secret_name}")) # encrypt secret using hashed encryption key
+        add_another = None
+        secret_name = input("\nType the name of the secret you want to encrypt:")
+        encrypted_secrets[secret_name] = encrypt_secret(key = _bin_key,
+                                                        secret_to_encrypt = get_masked_user_input(f"Now type its secret value\n{secret_name}")
+                                                    )
+        while True:
 
-    write_encrypted_secret_to_env(encrypted_secrets = {secret_name:msg},
-                                    path_to_env_file = env_path) # write encrypted secret to local .env file as hex
-
-    load_env(path_to_env_file = env_path) # load variables in .env file to environment
+            try:
+                add_another = input("Would you like to add another secret? (y/n)").strip().lower()
+                assert add_another in ['y','n']
+                break
+            except AssertionError:
+                print("Please type y for 'yes' or n for 'no'")
+                continue
+        
+        if add_another == "y":
+            continue
+        else:
+            break
     
     del _bin_key
+
+    write_encrypted_secrets_to_env(encrypted_secrets = encrypted_secrets,
+                                    path_to_env_file = env_path) # write encrypted secrets to local .env file as hex
+
+    load_env(path_to_env_file = env_path) # load variables in .env file to environment
 
     return None
 
 
-def decrypt_env_secret(secret_name: str, verify_json: str):
+def decrypt_env_secret(_bin_key: bytes, secret_name: str):
 
     encrypted_secret = bytes.fromhex(os.environ.get(secret_name))
 
     nonce = encrypted_secret[:8]
     ciphertext = encrypted_secret[8:]
-
-    _bin_key = key_gen(verify_json = verify_json)
 
     cipher = Salsa20.new(key = _bin_key, nonce = nonce)
 
