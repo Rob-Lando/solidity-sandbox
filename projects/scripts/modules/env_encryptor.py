@@ -1,8 +1,8 @@
+from pwinput import pwinput
 from Crypto.Cipher import Salsa20
 from Crypto.Protocol.KDF import scrypt
 import base64
 import argon2
-import pwinput
 import json
 import os
 
@@ -13,7 +13,7 @@ def store_argon2_hash_as_json(destination_path):
 
         ph = argon2.PasswordHasher()
 
-        hash = ph.hash(pwinput.pwinput(mask = "$"))
+        hash = ph.hash(pwinput(mask = "$"))
 
         json.dump({"hash":hash},__file__)
 
@@ -32,7 +32,7 @@ def verify_password(verify_json):
 
         stored_hash = json.load(verify) 
 
-        _pwd = pwinput.pwinput(mask = "$")
+        _pwd = pwinput(mask = "$")
 
         ph.verify(stored_hash['hash'],_pwd)
 
@@ -122,11 +122,13 @@ def setup_env(env_path, verify_json):
     while True:
         add_another = None
         secret_name = input("\n\nType the name of the secret you want to encrypt:")
-        encrypted_secrets[secret_name] = encrypt_secret(key = _bin_key,
-                                                        secret_to_encrypt =\
-                                                        pwinput.pwinput(f"\n\nNow type its secret value {secret_name}",
-                                                                        mask = "$")
+        encrypted_secrets[secret_name] = encrypt_secret(
+                                                    key = _bin_key,
+                                                    secret_to_encrypt = pwinput(
+                                                        f"\n\nNow type its secret value {secret_name}",
+                                                        mask = "$"
                                                     )
+                                                )
         while True:
             try:
                 add_another = input("Would you like to add another secret? (y/n)").strip().lower()
