@@ -75,7 +75,7 @@ def encrypt_secret(key: bytes, secret_to_encrypt: str) -> bytes:
 
     cipher = Salsa20.new(key = key)
 
-    secret_to_encrypt = bytes(secret_to_encrypt,'utf-8') # this is the value we want to encrypt
+    secret_to_encrypt = bytes(secret_to_encrypt,'utf-8')
 
     msg = cipher.nonce + cipher.encrypt(secret_to_encrypt)
 
@@ -120,16 +120,14 @@ def setup_env(env_path, verify_json):
     encrypted_secrets = {}
 
     while True:
-
         add_another = None
         secret_name = input("\n\nType the name of the secret you want to encrypt:")
         encrypted_secrets[secret_name] = encrypt_secret(key = _bin_key,
-                                                        secret_to_encrypt = pwinput.pwinput(f"\n\nNow type its secret value {secret_name}",
-                                                                                            mask = "$")
+                                                        secret_to_encrypt =\
+                                                        pwinput.pwinput(f"\n\nNow type its secret value {secret_name}",
+                                                                        mask = "$")
                                                     )
-
         while True:
-
             try:
                 add_another = input("Would you like to add another secret? (y/n)").strip().lower()
                 assert add_another in ['y','n']
@@ -137,18 +135,17 @@ def setup_env(env_path, verify_json):
             except AssertionError:
                 print("Please type y for 'yes' or n for 'no'")
                 continue
-        
         if add_another == "y":
             continue
         else:
             break
-    
+
     del _bin_key
 
     write_encrypted_secrets_to_env(encrypted_secrets = encrypted_secrets,
-                                    path_to_env_file = env_path) # write encrypted secrets to local .env file as hex
+                                    path_to_env_file = env_path)
 
-    load_env(path_to_env_file = env_path) # load variables in .env file to environment
+    load_env(path_to_env_file = env_path)
 
     return None
 
