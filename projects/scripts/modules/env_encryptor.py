@@ -125,7 +125,7 @@ def setup_env(env_path, verify_json):
         encrypted_secrets[secret_name] = encrypt_secret(
                                                     key = _bin_key,
                                                     secret_to_encrypt = pwinput(
-                                                        f"\n\nNow type its secret value {secret_name}",
+                                                        prompt = f"\n\nNow type its secret value {secret_name}",
                                                         mask = "$"
                                                     )
                                                 )
