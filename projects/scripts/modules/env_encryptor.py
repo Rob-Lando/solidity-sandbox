@@ -122,13 +122,12 @@ def setup_env(env_path, verify_json):
     while True:
         add_another = None
         secret_name = input("\n\nType the name of the secret you want to encrypt:")
-        encrypted_secrets[secret_name] = encrypt_secret(
-                                                    key = _bin_key,
-                                                    secret_to_encrypt = pwinput(
-                                                        prompt = f"\n\nNow type its secret value {secret_name}",
-                                                        mask = "$"
+        encrypted_secrets[secret_name] = encrypt_secret(key = _bin_key,
+                                                        secret_to_encrypt = pwinput(
+                                                            prompt = f"\n\nNow type its secret value {secret_name}",
+                                                            mask = "$"
+                                                        )
                                                     )
-                                                )
         while True:
             try:
                 add_another = input("Would you like to add another secret? (y/n)").strip().lower()
