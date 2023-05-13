@@ -12,7 +12,7 @@ if __name__ == "__main__":
 
     _key = key_gen(verify_json = "verify.json")
 
-    infura_url = f"https://mainnet.infura.io/v3/{decrypt_env_secret(_bin_key = _key, secret_name = 'INFURA_API_KEY')}"
+    infura_url = f"https://sepolia.infura.io/v3/{decrypt_env_secret(_bin_key = _key, secret_name = 'INFURA_API_KEY')}"
 
     web3 = Web3(Web3.HTTPProvider(infura_url))
 
