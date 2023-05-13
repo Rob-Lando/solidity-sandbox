@@ -160,6 +160,6 @@ def decrypt_env_secret(_bin_key: bytes, secret_name: str):
 
     cipher = Salsa20.new(key = _bin_key, nonce = nonce)
 
-    decrypted_secret = str(cipher.decrypt(ciphertext))
+    decrypted_secret = cipher.decrypt(ciphertext).decode('utf-8')
 
     return decrypted_secret
