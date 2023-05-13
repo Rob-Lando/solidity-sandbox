@@ -9,8 +9,6 @@ from modules.env_encryptor import (
     decrypt_env_secret
 )
 
-def compile_sol(path,solc_version)
-
 if __name__ == "__main__":
     
     env_vars = get_env_vars(path_to_env_file = "../.env",
