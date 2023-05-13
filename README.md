@@ -1,2 +1,2 @@
 # brownie-taste-test
-Sandbox repository for learning and experimenting with eth-brownie.
+Sandbox repository for learning and experimenting with web3.py & eth-brownie.
