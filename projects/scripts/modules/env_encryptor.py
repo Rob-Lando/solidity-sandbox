@@ -150,6 +150,13 @@ def setup_env(env_path, verify_json):
 
     return None
 
+def get_env_vars(path_to_env_file: str, env_var_names: list) -> dict:
+
+    load_env(path_to_env_file)
+
+    env_vars = {var:os.environ[var] for var in env_var_names}
+
+    return env_vars
 
 def decrypt_env_secret(_bin_key: bytes, secret_name: str):
 
