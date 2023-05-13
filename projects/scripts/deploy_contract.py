@@ -8,6 +8,7 @@ from modules.env_encryptor import (
     key_gen,
     decrypt_env_secret
 )
+import os
 
 if __name__ == "__main__":
     
@@ -22,13 +23,22 @@ if __name__ == "__main__":
 
     print(w3.isConnected())
 
-    install_solc(version = "0.8.0")
+    
+    compiler_version = "0.8.0"
+    compiler_versions = [cmplr.split("v")[-1] for cmplr in os.listdir(f"{os.path.expanduser('~')}/.solcx")]
+
+    print(f"Available compiler versions are:{compiler_versions}")
+
+    if compiler_version not in compiler_versions:
+        install_solc(version = compiler_version)
+
+
     with open('../contracts/bet_ledger.sol', 'r') as sol:
         source = sol.read()
 
     compiled_src = compile_source(source,
-                                 output_values=["abi", "bin-runtime"],
-                                 solc_version="0.8.0")
+                                 output_values = ["abi", "bin-runtime"],
+                                 solc_version = compiler_version)
     
     compiled_src = compiled_src[list(compiled_src.keys())[0]]
 
