@@ -1,8 +1,5 @@
-import shutil
-import os
 from web3 import Web3
 from modules.env_encryptor import (
-    load_env,
     get_env_vars,
     key_gen,
     decrypt_env_secret
