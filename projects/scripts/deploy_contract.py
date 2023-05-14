@@ -33,8 +33,9 @@ if __name__ == "__main__":
     w3 = Web3(Web3.HTTPProvider(infura_url))
 
     print(f"\n\nConnected: {w3.is_connected()}\n\n")
+    print(f"\n\nGAS PRICE IS: {w3.eth.gas_price} Wei\n\n")
 
-    deployer_account = Web3.eth.account.from_key(
+    deployer_account = w3.eth.account.from_key(
                             private_key = decrypt_env_secret(_bin_key = _key,secret_name = 'SEPOLIA_WALLET')
                         )
 
@@ -54,18 +55,22 @@ if __name__ == "__main__":
     print(f"""{contract_id}\n\n{compiled_src['abi']}\n\n<{compiled_src['bin-runtime']}>""")
 
     contract = w3.eth.contract(abi = compiled_src["abi"], bytecode = compiled_src["bin-runtime"])
+    gas_estimate = contract.constructor().estimate_gas()
 
+    print(f"\n\nContract gas estimate is: {gas_estimate} Wei\n\n")
+
+    """
     transaction = contract.constructor().build_transaction(
                     {
-                        'from': Web3.to_checksum_address(deployer_account.address),
-                        'gas': 3000000,
-                        'gasPrice': Web3.toWei('50', 'gwei'),
-                        'nonce': Web3.eth.get_transaction_count(deployer_account.address),
+                        'from':     w3.to_checksum_address(deployer_account.address),
+                        'gas':      gas_estimate,
+                        'gasPrice': w3.eth.gas_price,
+                        'nonce':    w3.eth.get_transaction_count(deployer_account.address),
                     }
                 )
     
     signed_transaction = deployer_account.sign_transaction(transaction)
-
+    """
 
 
     #print(list(contract.functions))
