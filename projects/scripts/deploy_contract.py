@@ -1,3 +1,4 @@
+import os
 from web3 import Web3
 from solcx import (
     install_solc, 
@@ -8,7 +9,17 @@ from modules.env_encryptor import (
     key_gen,
     decrypt_env_secret
 )
-import os
+
+def set_solc(version):
+
+    compiler_versions = [cmplr.split("v")[-1] for cmplr in os.listdir(f"{os.path.expanduser('~')}/.solcx")]
+
+    print(f"\n\nAvailable compiler versions are:{compiler_versions}\n\n")
+
+    if version not in compiler_versions:
+        install_solc(version = version)
+    
+    return version
 
 if __name__ == "__main__":
     
@@ -21,28 +32,40 @@ if __name__ == "__main__":
 
     w3 = Web3(Web3.HTTPProvider(infura_url))
 
-    print(w3.isConnected())
+    print(f"\n\nConnected: {w3.is_connected()}\n\n")
 
-    
-    compiler_version = "0.8.0"
-    compiler_versions = [cmplr.split("v")[-1] for cmplr in os.listdir(f"{os.path.expanduser('~')}/.solcx")]
+    deployer_account = Web3.eth.account.from_key(
+                            private_key = decrypt_env_secret(_bin_key = _key,secret_name = 'SEPOLIA_WALLET')
+                        )
 
-    print(f"Available compiler versions are:{compiler_versions}")
-
-    if compiler_version not in compiler_versions:
-        install_solc(version = compiler_version)
-
-
+    # compile contract
     with open('../contracts/bet_ledger.sol', 'r') as sol:
         source = sol.read()
 
-    compiled_src = compile_source(source,
-                                 output_values = ["abi", "bin-runtime"],
-                                 solc_version = compiler_version)
+    compiled_src = compile_source(
+                                    source,
+                                    output_values = ["abi", "bin-runtime"],
+                                    solc_version = set_solc("0.8.0")
+                                )
     
+    contract_id = list(compiled_src.keys())[0].split(":")[1]
     compiled_src = compiled_src[list(compiled_src.keys())[0]]
 
-    print(compiled_src['abi'],"\n\n",compiled_src['bin-runtime'])
+    print(f"""{contract_id}\n\n{compiled_src['abi']}\n\n<{compiled_src['bin-runtime']}>""")
 
-    #contract = w3.eth.contract(abi = compiled_src["abi"], bytecode = compiled_src["bin-runtime"])
+    contract = w3.eth.contract(abi = compiled_src["abi"], bytecode = compiled_src["bin-runtime"])
 
+    transaction = contract.constructor().build_transaction(
+                    {
+                        'from': Web3.to_checksum_address(deployer_account.address),
+                        'gas': 3000000,
+                        'gasPrice': Web3.toWei('50', 'gwei'),
+                        'nonce': Web3.eth.get_transaction_count(deployer_account.address),
+                    }
+                )
+    
+    signed_transaction = deployer_account.sign_transaction(transaction)
+
+
+
+    #print(list(contract.functions))
