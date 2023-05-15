@@ -32,6 +32,7 @@ if __name__ == "__main__":
 
     w3 = Web3(Web3.HTTPProvider(infura_url))
 
+    #print(f'\n{type(w3)} Object attributes:\n{dir(w3)}\n\n')
     print(f"\n\nConnected: {w3.is_connected()}\n\n")
     print(f"\n\nGAS PRICE IS: {w3.eth.gas_price} Wei\n\n")
 
@@ -45,21 +46,21 @@ if __name__ == "__main__":
 
     compiled_src = compile_source(
                                     source,
-                                    output_values = ["abi", "bin-runtime"],
+                                    output_values = ["abi", "bin"],
                                     solc_version = set_solc("0.8.0")
                                 )
     
     contract_id = list(compiled_src.keys())[0].split(":")[1]
     compiled_src = compiled_src[list(compiled_src.keys())[0]]
 
-    print(f"""{contract_id}\n\n{compiled_src['abi']}\n\n<{compiled_src['bin-runtime']}>""")
-
-    contract = w3.eth.contract(abi = compiled_src["abi"], bytecode = compiled_src["bin-runtime"])
+    #print(f"""{contract_id}\n\n{compiled_src['abi']}\n\n<{compiled_src['bin']}>""")
+    
+    contract = w3.eth.contract(abi = compiled_src["abi"], bytecode = compiled_src["bin"])
     gas_estimate = contract.constructor().estimate_gas()
 
     print(f"\n\nContract gas estimate is: {gas_estimate} Wei\n\n")
 
-    """
+    
     transaction = contract.constructor().build_transaction(
                     {
                         'from':     w3.to_checksum_address(deployer_account.address),
@@ -70,7 +71,9 @@ if __name__ == "__main__":
                 )
     
     signed_transaction = deployer_account.sign_transaction(transaction)
-    """
 
+    #print(signed_transaction.rawTransaction)
 
-    #print(list(contract.functions))
+    tx_hash = w3.eth.send_raw_transaction(signed_transaction.rawTransaction)
+    
+    print(f"\n\nTransaction hash: {tx_hash.hex()}\n\n")
