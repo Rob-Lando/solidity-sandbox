@@ -7,7 +7,7 @@ import json
 import os
 
 
-def store_argon2_hash_as_json(destination_path):
+def store_argon2_hash_as_json(destination_path: str) -> None:
 
     with open(destination_path,"w") as __file__:
 
@@ -20,7 +20,7 @@ def store_argon2_hash_as_json(destination_path):
     return None
 
 
-def verify_password(verify_json):
+def verify_password(verify_json: str) -> str:
 
     """
     Verify password and rehash if needed.
@@ -47,7 +47,7 @@ def verify_password(verify_json):
     return _pwd
 
 
-def key_gen(verify_json):
+def key_gen(verify_json: str) -> bytes:
 
     """Generate encryption key using stored salt"""
 
@@ -88,7 +88,7 @@ def encrypt_secret(key: bytes, secret_to_encrypt: str) -> bytes:
     return msg
 
 
-def write_encrypted_secrets_to_env(encrypted_secrets: dict, path_to_env_file: str):
+def write_encrypted_secrets_to_env(encrypted_secrets: dict, path_to_env_file: str) -> None:
 
     with open(path_to_env_file, "w") as f:
 
@@ -102,7 +102,7 @@ def write_encrypted_secrets_to_env(encrypted_secrets: dict, path_to_env_file: st
     return None
 
 
-def load_env(path_to_env_file):
+def load_env(path_to_env_file: str) -> None:
 
     with open(path_to_env_file,'r') as f:
 
@@ -114,20 +114,22 @@ def load_env(path_to_env_file):
     return None
 
 
-def setup_env(env_path, verify_json):
+def setup_env(env_path: str, verify_json: str) -> None:
         
     _bin_key = key_gen(verify_json = verify_json)
+    
     encrypted_secrets = {}
 
     while True:
         add_another = None
         secret_name = input("\n\nType the name of the secret you want to encrypt:")
-        encrypted_secrets[secret_name] = encrypt_secret(key = _bin_key,
-                                                        secret_to_encrypt = pwinput(
-                                                            prompt = f"\n\nNow type its secret value {secret_name}",
-                                                            mask = "$"
-                                                        )
-                                                    )
+        encrypted_secrets[secret_name] = encrypt_secret(
+                                            key = _bin_key,
+                                            secret_to_encrypt = pwinput(
+                                                                prompt = f"\n\nNow type its secret value {secret_name}",
+                                                                mask = "$"
+                                                            )
+                                    )
         while True:
             try:
                 add_another = input("Would you like to add another secret? (y/n)").strip().lower()
@@ -136,6 +138,7 @@ def setup_env(env_path, verify_json):
             except AssertionError:
                 print("Please type y for 'yes' or n for 'no'")
                 continue
+
         if add_another == "y":
             continue
         else:
@@ -158,7 +161,7 @@ def get_env_vars(path_to_env_file: str, env_var_names: list) -> dict:
 
     return env_vars
 
-def decrypt_env_secret(_bin_key: bytes, secret_name: str):
+def decrypt_env_secret(_bin_key: bytes, secret_name: str) -> str:
 
     encrypted_secret = bytes.fromhex(os.environ.get(secret_name))
 
