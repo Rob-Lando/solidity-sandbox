@@ -1,15 +1,31 @@
 from pwinput import pwinput
 from Crypto.Cipher import Salsa20
 from Crypto.Protocol.KDF import scrypt
+import platform
 import base64
 import argon2
 import json
+import stat
 import os
 
 
-def store_argon2_hash_as_json(destination_path: str) -> None:
+def set_to_read_only(file_path: str) -> None:
 
-    with open(destination_path,"w") as __file__:
+    operating_system = platform.system()
+
+    if operating_system == "Windows":
+
+        os.chmod(destination_path, mode = stat.FILE_ATTRIBUTE_READONLY)
+
+    else:
+        # Will modify later to work with other os
+        raise ValueError
+
+    return None
+
+def store_argon2_hash_as_json(json_path: str) -> None:
+
+    with open(json_path,"w") as __file__:
 
         ph = argon2.PasswordHasher()
 
@@ -17,8 +33,9 @@ def store_argon2_hash_as_json(destination_path: str) -> None:
 
         json.dump({"hash":hash},__file__)
 
-    return None
+        set_to_read_only(json_path)
 
+    return None
 
 def verify_password(verify_json: str) -> str:
 
