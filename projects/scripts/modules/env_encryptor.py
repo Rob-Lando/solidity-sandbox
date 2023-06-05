@@ -131,7 +131,7 @@ def load_env(path_to_env_file: str) -> None:
     return None
 
 
-def setup_env(env_path: str, verify_json: str) -> None:
+def setup_env(env_path: str, verify_json: str, read_only: bool = True) -> None:
         
     _bin_key = key_gen(verify_json = verify_json)
     
@@ -165,6 +165,9 @@ def setup_env(env_path: str, verify_json: str) -> None:
 
     write_encrypted_secrets_to_env(encrypted_secrets = encrypted_secrets,
                                     path_to_env_file = env_path)
+
+    if read_only:
+        set_to_read_only(file_path = env_path)
 
     load_env(path_to_env_file = env_path)
 
