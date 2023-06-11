@@ -15,7 +15,7 @@ def set_to_read_only(file_path: str) -> None:
 
     if operating_system == "Windows":
 
-        os.chmod(destination_path, mode = stat.FILE_ATTRIBUTE_READONLY)
+        os.chmod(file_path, mode = stat.S_IWRITE|stat.S_IREAD)
 
     else:
         # Will modify later to work with other os
